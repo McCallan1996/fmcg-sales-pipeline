@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: fmcg_processed
+    database: "{{ env_var('GCP_PROJECT_ID') }}"
+    schema: fmcg_processed
+    tables:
+      - name: daily_sales_enriched
+        description: Spark-enriched daily sales with computed fields
+        loaded_at_field: sale_date
+        freshness:
+          warn_after: { count: 3, period: day }
+          error_after: { count: 7, period: day }

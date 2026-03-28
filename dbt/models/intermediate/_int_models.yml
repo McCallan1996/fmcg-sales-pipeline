@@ -1,0 +1,8 @@
+version: 2
+
+models:
+  - name: int_daily_channel_sales
+    description: Daily aggregates by channel, region, and category
+
+  - name: int_promotion_effectiveness
+    description: Monthly promo vs non-promo comparison by category and channel

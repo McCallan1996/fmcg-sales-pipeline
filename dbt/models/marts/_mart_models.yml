@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: fct_sales_summary
+    description: >
+      Daily sales aggregated by channel and region.
+      Partitioned by sale_date (month), clustered by sales_channel and region.
+      This is the main table powering the Looker Studio dashboard.
+    columns:
+      - name: sale_date
+        tests: [not_null]
+      - name: total_revenue
+        tests: [not_null]
+
+  - name: fct_promotion_impact
+    description: >
+      Monthly promotion lift analysis by category and channel.
+      Shows how much promotions move the needle on quantity and revenue.
+    columns:
+      - name: category
+        tests: [not_null]
+
+  - name: dim_product
+    description: One row per SKU with its brand, segment, category, pack type
+    columns:
+      - name: sku
+        tests: [unique, not_null]
+
+  - name: dim_calendar
+    description: Date dimension covering all dates in the dataset
+    columns:
+      - name: sale_date
+        tests: [unique, not_null]

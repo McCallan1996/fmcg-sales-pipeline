@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: stg_fmcg_sales
+    description: Cleaned and standardized daily sales records
+    columns:
+      - name: sale_id
+        description: Surrogate key
+        tests:
+          - unique
+          - not_null
+      - name: sale_date
+        tests:
+          - not_null
+      - name: revenue
+        tests:
+          - not_null
