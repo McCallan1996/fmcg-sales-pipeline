@@ -51,7 +51,8 @@ One DAG. Five tasks. Triggered daily. The whole thing runs in Docker — Airflow
 | Layer | Tool | Why |
 |-------|------|-----|
 | Infrastructure | **Terraform** | One `terraform apply` to spin up everything on GCP |
-| Containers | **Docker Compose** | 8 services: Airflow cluster (webserver, scheduler, worker, init, Postgres, Redis) + Spark (master, worker) |
+| Containers | **Docker Compose** | 6 services: Airflow (webserver, scheduler, worker, init) + Postgres + Redis |
+| CI/CD | **GitHub Actions** | Validates Terraform, lints SQL and Python, verifies Docker builds on every push |
 | Package management | **uv** | Faster Python dependency installs inside Docker images |
 | Orchestration | **Airflow** (CeleryExecutor) | DAG chains 5 tasks with retries and logging |
 | Data Lake | **GCS** | Raw CSV lands here before anything else |
@@ -65,23 +66,22 @@ One DAG. Five tasks. Triggered daily. The whole thing runs in Docker — Airflow
 ```
 .
 ├── .env.example            # template — copy to .env and fill in your secrets
+├── .github/workflows/ci.yml  # CI: lint Terraform, SQL, Python + Docker build check
 ├── Makefile                 # shortcuts: make setup, make infra-up, make docker-up
 ├── terraform/               # IaC: GCS bucket + 3 BigQuery datasets
 ├── docker/
-│   └── docker-compose.yml   # 8 services (Airflow cluster + Spark cluster)
+│   └── docker-compose.yml   # 6 services (Airflow cluster + Postgres + Redis)
 ├── airflow/
 │   ├── Dockerfile           # custom image with Java, uv, all Python deps
 │   ├── dags/
 │   │   └── fmcg_pipeline_dag.py   # the single DAG — 5 tasks in sequence
 │   └── scripts/
 │       ├── download_dataset.py    # Kaggle API download + unzip
-│       ├── upload_to_gcs.py       # upload CSVs to GCS data lake
-│       ├── gcs_to_bigquery.py     # load main CSV into BigQuery raw table
-│       └── run_spark_job.py       # spark-submit with shaded BQ connector
-├── spark/
-│   ├── Dockerfile
-│   └── jobs/
-│       └── transform_sales.py     # PySpark: revenue calc, date features, type casts
+│       ├── upload_to_gcs.py       # upload main CSV to GCS data lake
+│       ├── gcs_to_bigquery.py     # load CSV into BigQuery raw table
+│       └── run_spark_job.py       # spark-submit in local mode with shaded BQ connector
+├── spark/jobs/
+│   └── transform_sales.py         # PySpark: revenue calc, date features, type casts
 ├── dbt/
 │   ├── dbt_project.yml
 │   ├── profiles.yml               # BigQuery connection (uses env vars)
@@ -168,15 +168,15 @@ cd ../docker
 docker compose --env-file ../.env up -d
 ```
 
-Give it about a minute to boot. The first time takes longer because Docker builds the Airflow and Spark images. Airflow UI will be at http://localhost:8080 — login with `admin` / `admin`.
+Give it about a minute to boot. The first time takes longer because Docker builds the Airflow image. Airflow UI will be at http://localhost:8080 — login with `admin` / `admin`.
 
 ### 5. Run the pipeline
 
 Find `fmcg_daily_sales_pipeline` in the Airflow UI. Unpause it. Hit the play button. Watch the five tasks turn green one by one:
 
-1. **download_from_kaggle** — pulls the dataset from Kaggle (~4 MB, unzips to 3 CSVs)
-2. **upload_to_gcs** — uploads all CSVs to the GCS data lake
-3. **load_to_bigquery_raw** — loads `FMCG_2022_2024.csv` (the main file, 190k rows) into BigQuery
+1. **download_from_kaggle** — pulls the dataset from Kaggle (~4 MB)
+2. **upload_to_gcs** — uploads the main CSV (`FMCG_2022_2024.csv`) to the GCS data lake
+3. **load_to_bigquery_raw** — loads 190k rows into BigQuery
 4. **spark_transform** — reads from BigQuery, adds revenue/date features/weekend flag, writes back to BigQuery
 5. **run_dbt** — installs dbt packages, builds 3 staging/intermediate views + 4 mart tables, runs 11 data tests
 

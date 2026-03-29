@@ -89,42 +89,6 @@ services:
     command: airflow celery worker -H worker@%h
     restart: always
 
-  spark-master:
-    build:
-      context: ../spark
-      dockerfile: Dockerfile
-    command: bash -c "/opt/spark/sbin/start-master.sh && tail -f /opt/spark/logs/*"
-    environment:
-      SPARK_MASTER_HOST: spark-master
-      GOOGLE_APPLICATION_CREDENTIALS: /opt/spark/credentials/google_credentials.json
-      GCP_PROJECT_ID: ${GCP_PROJECT_ID}
-      GCS_BUCKET_NAME: ${GCS_BUCKET_NAME}
-    ports:
-      - "7077:7077"
-      - "8081:8080"
-    volumes:
-      - ../spark/jobs:/opt/spark/jobs
-      - ../data:/opt/data
-      - ../credentials:/opt/spark/credentials:ro
-
-  spark-worker:
-    build:
-      context: ../spark
-      dockerfile: Dockerfile
-    command: bash -c "/opt/spark/sbin/start-worker.sh spark://spark-master:7077 && tail -f /opt/spark/logs/*"
-    environment:
-      SPARK_WORKER_MEMORY: 2g
-      SPARK_WORKER_CORES: 2
-      GOOGLE_APPLICATION_CREDENTIALS: /opt/spark/credentials/google_credentials.json
-      GCP_PROJECT_ID: ${GCP_PROJECT_ID}
-      GCS_BUCKET_NAME: ${GCS_BUCKET_NAME}
-    depends_on:
-      - spark-master
-    volumes:
-      - ../spark/jobs:/opt/spark/jobs
-      - ../data:/opt/data
-      - ../credentials:/opt/spark/credentials:ro
-
 volumes:
   postgres-data:
   airflow-logs:

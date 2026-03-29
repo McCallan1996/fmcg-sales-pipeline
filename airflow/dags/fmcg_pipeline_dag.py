@@ -23,7 +23,7 @@ with DAG(
     dag_id="fmcg_daily_sales_pipeline",
     default_args=default_args,
     description="End-to-end FMCG sales pipeline: Kaggle -> GCS -> BQ -> Spark -> dbt",
-    schedule_interval="@daily",
+    schedule="@daily",
     catchup=False,
     tags=["fmcg", "batch"],
 ) as dag:
