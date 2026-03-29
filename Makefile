@@ -13,13 +13,13 @@ setup:
 	@echo "Now edit .env with your actual values"
 
 infra-up:
-	cd terraform && terraform init && terraform apply -auto-approve
+	cd terraform && terraform init && terraform apply
 
 infra-down:
-	cd terraform && terraform destroy -auto-approve
+	cd terraform && terraform destroy
 
 docker-up:
-	cd docker && docker-compose --env-file ../.env up -d
+	cd docker && docker compose --env-file ../.env up -d
 
 docker-down:
-	cd docker && docker-compose down -v
+	cd docker && docker compose down -v

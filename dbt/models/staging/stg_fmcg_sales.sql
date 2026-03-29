@@ -4,22 +4,23 @@ with source as (
 
 cleaned as (
     select
-        {{ dbt_utils.generate_surrogate_key(['sale_date', 'SKU', 'Sales_Channel', 'Region']) }} as sale_id,
+        {{ dbt_utils.generate_surrogate_key(['sale_date', 'sku', 'channel', 'region']) }} as sale_id,
 
         sale_date,
-        SKU as sku,
-        Brand as brand,
-        Segment as segment,
-        Category as category,
-        Sales_Channel as sales_channel,
-        Region as region,
-        Pack_Type as pack_type,
+        sku,
+        brand,
+        segment,
+        category,
+        channel as sales_channel,
+        region,
+        pack_type,
 
-        cast(Sales_Quantity as int64) as sales_quantity,
-        cast(Price as float64) as price,
-        cast(Stock_Level as int64) as stock_level,
-        cast(Delivery_Lag as int64) as delivery_lag,
-        coalesce(cast(Promotion as bool), false) as has_promotion,
+        cast(price_unit as float64) as price,
+        cast(units_sold as int64) as sales_quantity,
+        cast(stock_available as int64) as stock_level,
+        cast(delivery_days as int64) as delivery_lag,
+        cast(delivered_qty as int64) as delivered_qty,
+        coalesce(cast(promotion_flag as bool), false) as has_promotion,
 
         revenue,
         year,

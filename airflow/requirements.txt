@@ -1,6 +1,6 @@
-kaggle==1.6.17
-google-cloud-storage==2.18.2
-google-cloud-bigquery==3.25.0
-apache-airflow-providers-google==10.22.0
-dbt-bigquery==1.8.2
+kaggle
+google-cloud-storage
+google-cloud-bigquery
+apache-airflow-providers-google
+dbt-bigquery
 pyspark==3.5.3

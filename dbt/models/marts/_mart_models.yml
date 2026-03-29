@@ -21,10 +21,12 @@ models:
         tests: [not_null]
 
   - name: dim_product
-    description: One row per SKU with its brand, segment, category, pack type
+    description: One row per SKU + pack_type combo
     columns:
       - name: sku
-        tests: [unique, not_null]
+        tests: [not_null]
+      - name: pack_type
+        tests: [not_null]
 
   - name: dim_calendar
     description: Date dimension covering all dates in the dataset

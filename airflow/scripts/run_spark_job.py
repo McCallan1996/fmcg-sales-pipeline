@@ -2,24 +2,22 @@ import subprocess
 import sys
 
 
-SPARK_MASTER = "spark://spark-master:7077"
 JOB_PATH = "/opt/spark/jobs/transform_sales.py"
 
-# connector jars needed for spark <-> bigquery
-BQ_CONNECTOR = "com.google.cloud.spark:spark-3.5-bigquery:0.39.1"
-GCS_CONNECTOR = "com.google.cloud.bigdataoss:gcs-connector:hadoop3-2.2.21"
+# use the shaded "with-dependencies" jar to avoid guava conflicts
+BQ_CONNECTOR = "com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.36.1"
 
 
 def submit():
     cmd = [
         "spark-submit",
-        "--master", SPARK_MASTER,
-        "--packages", f"{BQ_CONNECTOR},{GCS_CONNECTOR}",
+        "--master", "local[*]",
+        "--packages", BQ_CONNECTOR,
         "--conf", "spark.hadoop.fs.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem",
         JOB_PATH,
     ]
 
-    print(f"Submitting spark job: {' '.join(cmd)}")
+    print(f"Running spark job: {' '.join(cmd)}")
     result = subprocess.run(cmd, capture_output=False)
 
     if result.returncode != 0:

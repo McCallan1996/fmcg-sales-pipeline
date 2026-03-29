@@ -19,7 +19,7 @@ def load():
         write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE,
     )
 
-    uri = f"gs://{BUCKET_NAME}/raw/fmcg_sales/*.csv"
+    uri = f"gs://{BUCKET_NAME}/raw/fmcg_sales/FMCG_2022_2024.csv"
     print(f"Loading {uri} into {table_ref}")
 
     job = client.load_table_from_uri(uri, table_ref, job_config=job_config)

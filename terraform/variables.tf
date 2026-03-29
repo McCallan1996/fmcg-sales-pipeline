@@ -12,5 +12,5 @@ variable "region" {
 variable "credentials_file" {
   description = "Path to GCP service account key JSON"
   type        = string
-  default     = "~/.google/credentials/google_credentials.json"
+  default     = "../credentials/google_credentials.json"
 }
