@@ -32,13 +32,10 @@ jobs:
 
       - uses: astral-sh/setup-uv@v4
 
-      - name: Install sqlfluff
-        run: uv pip install --system sqlfluff sqlfluff-templater-dbt dbt-bigquery
-
       - name: Lint SQL
         run: |
           cd dbt
-          sqlfluff lint models/ \
+          uvx sqlfluff lint models/ \
             --dialect bigquery \
             --exclude-rules LT05,AM04,ST06,RF04,LT02 \
             --ignore templating
@@ -51,11 +48,8 @@ jobs:
 
       - uses: astral-sh/setup-uv@v4
 
-      - name: Install ruff
-        run: uv pip install --system ruff
-
       - name: Check formatting
-        run: ruff check airflow/ spark/
+        run: uvx ruff check airflow/ spark/
 
   docker-build:
     name: Verify Docker builds
